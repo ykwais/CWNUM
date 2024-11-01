@@ -90,6 +90,9 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
     size_t counter = 0;
     std::vector<long double> time_values;
     std::vector<long double> temperature_values;
+    auto beg_temperature = current_temperature;
+
+
 
     while (std::abs(temperature_gas - current_temperature) > eps) {
         previous_temperature = current_temperature;
@@ -123,7 +126,27 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
     }
 
 
-    std::cout << "total_time = " << total_time/1000 << " sec\n";
+    auto h = get_h(eps, k, radius, temperature_gas, density_air, S, T0, v0, Cp_air, g);
+
+    if(beg_temperature < temperature_gas)
+    {
+
+        total_time = (density_material*Cp_Fe*radius*radius*2)/(3*h) * std::log(( temperature_gas - beg_temperature )/(0.01*temperature_gas));
+    }
+    else
+    {
+        total_time = -(density_material*Cp_Fe*radius*radius*2)/(3*h)* std::log((0.01*temperature_gas )/(beg_temperature - temperature_gas));
+    }
+
+
+
+
+
+
+    //std::cout << "total_time = " << total_time/1000 << " sec\n";
+    std::cout << "total_time = " << total_time<< " sec\n";
+
+
 
 
     graphwidget->setData(time_values, temperature_values);

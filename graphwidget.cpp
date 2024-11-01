@@ -95,7 +95,7 @@ void graphwidget::paintEvent(QPaintEvent *event) {
     painter.drawText(xStart, yStart - 10, QString::number(temperatureValues[0], 'f', 2));
 
     painter.setPen(Qt::black);
-    long double total = total_time/1000;
+    long double total = total_time;
     std::string str = "Total Time: " + std::to_string(total) + " s";
     QString totalTimeText = QString(str.c_str());
     painter.drawText(50, height - 30, totalTimeText);

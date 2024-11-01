@@ -19,7 +19,7 @@ long double get_velocity(long double eps, long double temperature_of_gas, long d
 
 long double get_Pr(long double temperature_of_gas, long double Cp_air, long double k, long double S, long double T0, long double v0)
 {
-    return Cp_air * get_viscosity(temperature_of_gas, S, T0, v0) / k;
+    return Cp_air * get_viscosity(temperature_of_gas, S, T0, v0)/ k;
 }
 
 long double get_Re(long double eps, long double temperature_of_gas, long double radius,
