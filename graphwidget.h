@@ -8,11 +8,10 @@
 #include <QWidget>
 #include <QPainter>
 #include <vector>
+#include <QTimer>
 
 
-//QT_BEGIN_NAMESPACE
-//namespace Ui { class graphwidget; }
-//QT_END_NAMESPACE
+
 
 class graphwidget : public QWidget {
 Q_OBJECT
@@ -21,16 +20,27 @@ public:
     explicit graphwidget(QWidget *parent = nullptr);
 
     void setData(const std::vector<long double>& time, const std::vector<long double>& temperature);
+    void setTargetTemperature(long double targetTemperature);
+    void update_total_time(long double new_total_time);
+
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
+private slots:
+
+    void updateGraphStep();
+
+
 private:
     std::vector<long double> timeValues;
     std::vector<long double> temperatureValues;
+    long double targetTemperature = 0;
+    int pointsToShow = 0;
+    QTimer* timer;
+    long double total_time;
 
-//private:
-//    Ui::graphwidget *ui;
+
 };
 
 

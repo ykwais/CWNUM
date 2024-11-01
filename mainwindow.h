@@ -43,6 +43,7 @@ private:
 
     QDoubleSpinBox *radiusInput;
     QDoubleSpinBox *temperatureInput;
+    QDoubleSpinBox *maxTemperatureInput;
     graphwidget* graphwidget;
 
     void calculateTemperatures(long double radius, long double current_temperature);

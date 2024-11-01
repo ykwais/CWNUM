@@ -7,29 +7,55 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <algorithm>
+#include <QLabel>
 
 
 
 mainwindow::mainwindow(QWidget *parent) :
-        QMainWindow(parent), ui(new Ui::mainwindow) {
+        QMainWindow(parent), ui(new Ui::mainwindow)
+        {
     ui->setupUi(this);
+
+    QLabel *radiusLabel = new QLabel("Радиус:", this);
+    QLabel *temperatureLabel = new QLabel("Начальная температура частицы:", this);
+    QLabel *maxTemperatureLabel = new QLabel("температура потока:", this);
 
     // Создаем поля ввода
     radiusInput = new QDoubleSpinBox(this);
-    radiusInput->setRange(0.001, 1.0); // Устанавливаем диапазон
-    radiusInput->setValue(0.01); // Начальное значение
+    radiusInput->setRange(0.0001, 0.1);
+    radiusInput->setValue(0.01);
+    radiusInput->setDecimals(4);
+    radiusInput->setSingleStep(0.0001);
 
     temperatureInput = new QDoubleSpinBox(this);
-    temperatureInput->setRange(0.0, 1000.0); // Устанавливаем диапазон
-    temperatureInput->setValue(200); // Начальное значение
+    temperatureInput->setRange(0.0, 10000.0);
+    temperatureInput->setValue(200);
+
+    maxTemperatureInput = new QDoubleSpinBox(this);
+    maxTemperatureInput->setRange(0.0, 10000.0);
+    maxTemperatureInput->setValue(300);
 
     QPushButton *updateButton = new QPushButton("Update Graph", this);
     connect(updateButton, &QPushButton::clicked, this, &mainwindow::updateGraph);
 
-    // Устанавливаем компоновку
+    QHBoxLayout *radiusLayout = new QHBoxLayout();
+    radiusLayout->addWidget(radiusLabel);
+    radiusLayout->addWidget(radiusInput);
+
+    QHBoxLayout *maxTemperatureLayout = new QHBoxLayout();
+    maxTemperatureLayout->addWidget(maxTemperatureLabel);
+    maxTemperatureLayout->addWidget(maxTemperatureInput);
+
+
+    QHBoxLayout *temperatureLayout = new QHBoxLayout();
+    temperatureLayout->addWidget(temperatureLabel);
+    temperatureLayout->addWidget(temperatureInput);
+
+
     QVBoxLayout *layout = new QVBoxLayout();
-    layout->addWidget(radiusInput);
-    layout->addWidget(temperatureInput);
+    layout->addLayout(radiusLayout);
+    layout->addLayout(temperatureLayout);
+    layout->addLayout(maxTemperatureLayout);
     layout->addWidget(updateButton);
 
     graphwidget = new class graphwidget(this);
@@ -37,9 +63,9 @@ mainwindow::mainwindow(QWidget *parent) :
 
     QWidget *centralWidget = new QWidget(this);
     centralWidget->setLayout(layout);
-    setCentralWidget(centralWidget); // Устанавливаем компоновку в главное окно
+    setCentralWidget(centralWidget);
 
-    // Вызываем начальное обновление графика
+
     updateGraph();
 }
 
@@ -51,18 +77,19 @@ void mainwindow::updateGraph() {
     long double radius = radiusInput->value();
     long double current_temperature = temperatureInput->value();
 
-    // Вызов функции для расчета температур
+
     calculateTemperatures(radius, current_temperature);
 }
 
 void mainwindow::calculateTemperatures(long double radius, long double current_temperature) {
-    long double temperature_gas = 3000.0; // Температура газа
+    long double temperature_gas = maxTemperatureInput->value();
     long double previous_temperature;
 
     long double step = 0.1;
+    long double total_time = 0.0;
     size_t counter = 0;
-    std::vector<long double> time_values; // Временные значения
-    std::vector<long double> temperature_values; // Температурные значения
+    std::vector<long double> time_values;
+    std::vector<long double> temperature_values;
 
     while (std::abs(temperature_gas - current_temperature) > eps) {
         previous_temperature = current_temperature;
@@ -72,7 +99,7 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
                                                     density_air, density_material, Cp_Fe,
                                                     Cp_air, k, S, T0, v0, g);
 
-        // Сохраняем значения
+
         time_values.push_back(counter);
         temperature_values.push_back(current_temperature);
 
@@ -91,10 +118,15 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
             step *= 1.2;
         }
 
-
+        total_time += step;
         counter++;
     }
 
-    // Рисуем график на основе time_values и temperature_values
+
+    std::cout << "total_time = " << total_time/1000 << " sec\n";
+
+
     graphwidget->setData(time_values, temperature_values);
+    graphwidget->setTargetTemperature(temperature_gas);
+    graphwidget->update_total_time(total_time);
 }
