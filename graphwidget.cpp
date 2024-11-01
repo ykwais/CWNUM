@@ -16,9 +16,13 @@ connect(timer, &QTimer::timeout, this, &graphwidget::updateGraphStep);
 }
 
 
-void graphwidget::setData(const std::vector<long double>& time, const std::vector<long double>& temperature) {
+void graphwidget::setData(const std::vector<long double>& time, const std::vector<long double>& temperature,
+                          const std::vector<long double>& time2, const std::vector<long double>& temperature2) {
     timeValues = time;
     temperatureValues = temperature;
+
+    timeValues2 = time2;
+    temperatureValues2 = temperature2;
 
     pointsToShow = 0;
     timer->start(std::max(1, (int)std::abs(total_time/timeValues.size())) );
@@ -82,6 +86,17 @@ void graphwidget::paintEvent(QPaintEvent *event) {
         painter.drawLine(x1, y1, x2, y2);
     }
 
+    painter.setPen(Qt::green);
+    for (size_t i = 1; i < pointsToShow && i < timeValues2.size(); ++i) {
+        int x1 = 50 + static_cast<int>((timeValues2[i - 1] / maxTime) * (width - 100));
+        int y1 = height - 50 - static_cast<int>((temperatureValues2[i - 1] / maxTemperature) * (height - 100));
+
+        int x2 = 50 + static_cast<int>((timeValues2[i] / maxTime) * (width - 100));
+        int y2 = height - 50 - static_cast<int>((temperatureValues2[i] / maxTemperature) * (height - 100));
+
+        painter.drawLine(x1, y1, x2, y2);
+    }
+
     painter.setPen(Qt::red);
     int yTarget = height - 50 - static_cast<int>((targetTemperature / maxTemperature) * (height - 100));
     painter.drawLine(50, yTarget, width - 50, yTarget);
@@ -96,7 +111,7 @@ void graphwidget::paintEvent(QPaintEvent *event) {
 
     painter.setPen(Qt::black);
     long double total = total_time;
-    std::string str = "Total Time: " + std::to_string(total) + " s";
+    std::string str = "Total Time (blue): " + std::to_string(total) + " s";
     QString totalTimeText = QString(str.c_str());
     painter.drawText(50, height - 30, totalTimeText);
 }

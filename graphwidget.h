@@ -19,7 +19,8 @@ Q_OBJECT
 public:
     explicit graphwidget(QWidget *parent = nullptr);
 
-    void setData(const std::vector<long double>& time, const std::vector<long double>& temperature);
+    void setData(const std::vector<long double>& time, const std::vector<long double>& temperature,
+                 const std::vector<long double>& time2, const std::vector<long double>& temperature2);
     void setTargetTemperature(long double targetTemperature);
     void update_total_time(long double new_total_time);
 
@@ -35,6 +36,8 @@ private slots:
 private:
     std::vector<long double> timeValues;
     std::vector<long double> temperatureValues;
+    std::vector<long double> timeValues2;
+    std::vector<long double> temperatureValues2;
     long double targetTemperature = 0;
     int pointsToShow = 0;
     QTimer* timer;
