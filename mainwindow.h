@@ -42,12 +42,11 @@ private:
     long double density_material = 7874.0;
 
     QDoubleSpinBox *radiusInput;
-    QDoubleSpinBox *radiusInput2;
     QDoubleSpinBox *temperatureInput;
     QDoubleSpinBox *maxTemperatureInput;
     graphwidget* graphwidget;
 
-    void calculateTemperatures(long double radius, long double current_temperature, long double radius2);
+    void calculateTemperatures(long double radius, long double current_temperature);
 };
 
 
