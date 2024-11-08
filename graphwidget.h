@@ -40,6 +40,7 @@ private:
     int pointsToShow = 0;
     QTimer* timer;
     long double total_time;
+    long double copy_total_time;
     long double radius;
 
 
