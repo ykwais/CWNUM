@@ -131,8 +131,6 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
     }
 
 
-
-
     auto h = get_h(eps, k, radius, temperature_gas, density_air, S, T0, v0, Cp_air, g);
 
     if(beg_temperature < temperature_gas)
@@ -146,25 +144,10 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-    //std::cout << "total_time = " << total_time/1000 << " sec\n";
     std::cout << "total_time = " << total_time<< " sec\n";
-    std::cout << counter << std::endl;
+    //std::cout << counter << std::endl;
 
-
-
-
-    graphwidget->setData(time_values, temperature_values);
+    graphwidget->setData(time_values, temperature_values, radiusInput->value());
     graphwidget->setTargetTemperature(temperature_gas);
     graphwidget->update_total_time(total_time);
 }
