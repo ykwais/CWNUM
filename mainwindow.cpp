@@ -31,12 +31,12 @@ mainwindow::mainwindow(QWidget *parent) :
 
 
     temperatureInput = new QDoubleSpinBox(this);
-    temperatureInput->setRange(0.0, 2000.0);
-    temperatureInput->setValue(200);
+    temperatureInput->setRange(298.15, 2000.0);
+    temperatureInput->setValue(298.15);
 
     maxTemperatureInput = new QDoubleSpinBox(this);
-    maxTemperatureInput->setRange(0.0, 2000.0);
-    maxTemperatureInput->setValue(300);
+    maxTemperatureInput->setRange(298.15, 2000.0);
+    maxTemperatureInput->setValue(2000.0);
 
     QPushButton *updateButton = new QPushButton("Update Graph", this);
     connect(updateButton, &QPushButton::clicked, this, &mainwindow::updateGraph);
@@ -119,7 +119,7 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
 
         long double delta_temp = std::abs(current_temperature - previous_temperature);
 
-        if (delta_temp > 0.05) {
+        if (delta_temp > 0.5) {
             step *= std::max((long double)0.5, 1.0 - delta_temp / 10.0);
             current_temperature = previous_temperature;
         } else if (delta_temp < 0.001 && step < 1.0) {
@@ -150,8 +150,16 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
 
 
 
+
+
+
+
+
+
+
     //std::cout << "total_time = " << total_time/1000 << " sec\n";
     std::cout << "total_time = " << total_time<< " sec\n";
+    std::cout << counter << std::endl;
 
 
 

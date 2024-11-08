@@ -71,6 +71,31 @@ void graphwidget::paintEvent(QPaintEvent *event) {
     painter.drawText(width - 100, height - 20, "Time (s)");
     painter.drawText(10, 30, "Temperature (K)");
 
+
+    long double timeStep = std::ceil(maxTime / 1.0) * 0.1;
+    long double tempStep = std::ceil(maxTemperature / 1.0) * 0.1;
+
+    long double delimeter = 10000*4.9;//для 0.0001
+    long double delimeter2 = 1000*5.85;//для 0.001
+    long double delimeter3 = 100*5.54*1.17;//для 0.01
+    long double delimeter4 = 10*5.1*1.32;//для 0.1 и возрастания темпы
+    long double delimeter5 = 20*5.7*1.8;//для 0.1 и уменьшения темпы
+
+
+
+    for (long double t = 0; t <= maxTime; t += timeStep) {
+        int x = 50 + static_cast<int>((t / maxTime) * (width - 100));
+        painter.drawLine(x, height - 50, x, height - 45);
+        painter.drawText(x - 10, height - 30, QString::number(t/delimeter, 'f', 1));
+    }
+
+
+    for (long double temp = 0; temp <= maxTemperature; temp += tempStep) {
+        int y = height - 50 - static_cast<int>((temp / maxTemperature) * (height - 100));
+        painter.drawLine(45, y, 50, y);
+        painter.drawText(10, y + 5, QString::number(temp, 'f', 1));
+    }
+
     painter.setPen(Qt::darkBlue);
 
 
@@ -102,6 +127,6 @@ void graphwidget::paintEvent(QPaintEvent *event) {
     long double total = total_time;
     std::string str = "Total Time (blue): " + std::to_string(total) + " s";
     QString totalTimeText = QString(str.c_str());
-    painter.drawText(50, height - 30, totalTimeText);
+    painter.drawText(50, height - 10, totalTimeText);
 }
 
