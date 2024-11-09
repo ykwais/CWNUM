@@ -16,10 +16,10 @@ mainwindow::mainwindow(QWidget *parent) :
         {
     ui->setupUi(this);
 
-    QLabel *radiusLabel = new QLabel("Радиус (blue):", this);
+    QLabel *radiusLabel = new QLabel("Радиус (blue) (м):", this);
 
-    QLabel *temperatureLabel = new QLabel("Начальная температура частицы:", this);
-    QLabel *maxTemperatureLabel = new QLabel("температура потока:", this);
+    QLabel *temperatureLabel = new QLabel("Начальная температура частицы (K):", this);
+    QLabel *maxTemperatureLabel = new QLabel("Температура потока (K):", this);
 
     // Создаем поля ввода
     radiusInput = new QDoubleSpinBox(this);

@@ -185,8 +185,21 @@ void graphwidget::paintEvent(QPaintEvent *event) {
     painter.drawLine(50, height - 50, width - 50, height - 50); // Ось X
     painter.drawLine(50, 50, 50, height - 50); // Ось Y
 
-    painter.drawText(width - 100, height - 20, "Time (s)");
+    painter.drawText(width - 100, height - 10, "Time (s)");
     painter.drawText(10, 30, "Temperature (K)");
+
+    long double tempStep = std::ceil(maxTemperature / 1.0) * 0.1;
+
+    for (long double temp = 0; temp <= maxTemperature; temp += tempStep) {
+        int y = height - 50 - static_cast<int>((temp / maxTemperature) * (height - 100));
+        painter.drawLine(45, y, 50, y);
+        painter.drawText(10, y + 5, QString::number(temp, 'f', 1));
+    }
+
+    painter.setPen(Qt::darkBlue);
+    int xStart = 5 + static_cast<int>((timeValues[0] / maxTime) * (width - 100));
+    int yStart = height - 45 - static_cast<int>((temperatureValues[0] / maxTemperature) * (height - 100));
+    painter.drawText(xStart, yStart - 10, QString::number(temperatureValues[0], 'f', 2));
 
 
     painter.setPen(Qt::darkBlue);
@@ -222,7 +235,7 @@ void graphwidget::paintEvent(QPaintEvent *event) {
 
 
         long double tmp_total = copy_total_time;
-        std::cout << tmp_total << std::endl;
+
         total_time = intersectionTime;
 
 
@@ -237,28 +250,28 @@ void graphwidget::paintEvent(QPaintEvent *event) {
         {
             if(counter > 10) break;
             long double tickTime = total_time + k * stepSize;
-            std::cout << "tickTime: " << tickTime << " i: " << k << " counter: " << counter << std::endl;
+
 
             if (tickTime >= 0 && tickTime <= maxTime)
             {
                 int xTick = 50 + static_cast<int>((tickTime / maxTime) * (width - 100));
                 auto tmp = tickTime*tmp_total/total_time;
-                std::cout << tmp << std::endl;
+
                 painter.drawText(xTick, height - 30, QString::number(tmp, 'f', 1));
                 painter.drawLine(xTick, height - 50, xTick, height - 45);
             }
             else if (tickTime > maxTime || tickTime < 0)
             {
                 QString totalTimeText = "Total Time: " + QString::number(tmp_total, 'f', 2) + " s";
-                painter.drawText(xIntersection - totalTimeText.length() * 3, height - 10, totalTimeText);
+                painter.drawText(xIntersection - totalTimeText.length() * 30, height, totalTimeText);
                 return;
             }
             counter++;
         }
 
-        QString totalTimeText = "Total Time: " + QString::number(tmp_total, 'f', 2) + " s";
-        painter.drawText(xIntersection - totalTimeText.length() * 3, height - 10, totalTimeText);
-        return;
+//        QString totalTimeText = "Total Time: " + QString::number(tmp_total, 'f', 2) + " s";
+//        painter.drawText(xIntersection - totalTimeText.length() * 3, height - 10, totalTimeText);
+//        return;
     }
     else
     {
