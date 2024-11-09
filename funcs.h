@@ -39,4 +39,6 @@ long double runge_kutta_4th_order(long double current_temperature, long double s
                                   long double Cp_air, long double k, long double S,
                                   long double T0, long double v0, long double g);
 
+void runge_kutta_4_distance(long double &velocity, long double &distance, long double step, long double g);
+
 #endif //CWNUM_FUNCS_H

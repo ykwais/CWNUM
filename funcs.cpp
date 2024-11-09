@@ -80,3 +80,25 @@ long double runge_kutta_4th_order(long double current_temperature, long double s
 
     return current_temperature + (1.0 / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4);
 }
+
+
+void runge_kutta_4_distance(long double &velocity, long double &distance, long double step, long double g)
+{
+
+    long double k1_v = g;
+    long double k2_v = g;
+    long double k3_v = g;
+    long double k4_v = g;
+
+
+    velocity += (step / 6.0) * (k1_v + 2.0 * k2_v + 2.0 * k3_v + k4_v);
+
+
+    long double k1_x = velocity;
+    long double k2_x = velocity + 0.5 * step * k1_v;
+    long double k3_x = velocity + 0.5 * step * k2_v;
+    long double k4_x = velocity + step * k3_v;
+
+
+    distance += (step / 6.0) * (k1_x + 2.0 * k2_x + 2.0 * k3_x + k4_x);
+}

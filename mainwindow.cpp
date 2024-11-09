@@ -95,7 +95,14 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
     size_t counter = 0;
     std::vector<long double> time_values;
     std::vector<long double> temperature_values;
+    std::vector<long double> velocity_values;
+    std::vector<long double> distance_values;
+    std::vector<long double> counter_values;
     auto beg_temperature = current_temperature;
+
+    long double velocity = 0.0; // Начальная скорость частицы
+    long double distance = 0.0; // Начальное расстояние
+
 
 
 
@@ -107,7 +114,16 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
                                                     density_air, density_material, Cp_Fe,
                                                     Cp_air, k, S, T0, v0, g);
 
+        runge_kutta_4_distance(velocity, distance, step*0.0001, g);
 
+
+        time_values.push_back(counter);
+        temperature_values.push_back(current_temperature);
+        velocity_values.push_back(velocity);
+        distance_values.push_back(distance);
+
+
+        counter_values.push_back(counter);
         time_values.push_back(counter);
         temperature_values.push_back(current_temperature);
 
@@ -150,4 +166,57 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
     graphwidget->setData(time_values, temperature_values, radiusInput->value());
     graphwidget->setTargetTemperature(temperature_gas);
     graphwidget->update_total_time(total_time);
+
+    size_t intersectionIndex = -1;
+    for (size_t i = 1; i < temperature_values.size(); ++i) {
+        if (std::abs(temperature_values[i - 1] - temperature_gas) < 0.001) {
+            intersectionIndex = i;
+            break;
+        }
+    }
+
+    if (intersectionIndex != -1)
+    {
+        std::cout << std::left << std::setw(15) << "Counter"
+                  << " | " << std::setw(15) << "Time"
+                  << " | " << std::setw(15) << "Velocity"
+                  << " | " << std::setw(25) << "Distance"
+                  << " | " << std::setw(15) << "Temperature"
+                  << std::endl;
+
+
+        std::cout << std::setfill(' ') << std::setw(15) << ""
+                  << " | " << std::setw(15) << ""
+                  << " | " << std::setw(15) << ""
+                  << " | " << std::setw(25) << ""
+                  << " | " << std::setw(15) << ""
+                  << std::endl;
+
+
+        for(size_t i = 0; i < counter_values.size(); i += 923)
+        {
+
+            std::cout << std::left << std::setw(15) << counter_values[i]
+                      << " | " << std::setw(15) << std::fixed << std::setprecision(2)
+                      << (time_values[i] * total_time * 1.5) / (time_values[intersectionIndex])
+                      << " | " << std::setw(15) << velocity_values[i]
+                      << " | " << std::setw(25)
+                      << g * (time_values[i] * total_time * 1.5) / (time_values[intersectionIndex])
+                         * (time_values[i] * total_time * 1.5) / (time_values[intersectionIndex]) / 2
+                      << " | " << std::setw(15) << temperature_values[i]
+                      << std::endl;
+        }
+
+
+        std::cout << std::left << std::setw(15) << counter_values[counter_values.size() - 1]
+                  << " | " << std::setw(15) << total_time
+                  << " | " << std::setw(15) << velocity_values[velocity_values.size() - 1]
+                  << " | " << std::setw(25) << g * total_time * total_time / 2
+                  << " | " << std::setw(15) << temperature_values[intersectionIndex]
+                  << std::endl;
+    }
+    else
+    {
+        throw std::runtime_error("No intersection found");
+    }
 }
