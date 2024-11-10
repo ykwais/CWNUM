@@ -8,20 +8,53 @@
 #include "ui_mainwindow.h"
 #include <algorithm>
 #include <QLabel>
+#include <QComboBox>
 
 
 
 mainwindow::mainwindow(QWidget *parent) :
         QMainWindow(parent), ui(new Ui::mainwindow)
         {
+            std::ofstream file2(filename, std::ios::trunc );
+            if(!file2.is_open())
+                throw std::runtime_error("Can't open file! 1");
+            file2.close();
+
     ui->setupUi(this);
+
+    QComboBox *materialComboBox = new QComboBox(this);
+    materialComboBox->addItem("Железо");
+    materialComboBox->addItem("Алюминий");
+    materialComboBox->addItem("Медь");
+
+
+    QMap<QString, QPair<long double, long double>> materialProperties;
+    materialProperties["Железо"] = qMakePair(7874.0, 460.0);
+    materialProperties["Алюминий"] = qMakePair(2700.0, 900.0);
+    materialProperties["Медь"] = qMakePair(8960.0, 385.0);
+
+
+    connect(materialComboBox, &QComboBox::currentTextChanged, this, [=](const QString &material) {
+        auto properties = materialProperties[material];
+        name_material = materialComboBox->currentText().toStdString();
+        density_material = properties.first;
+        Cp_Fe = properties.second;
+        updateGraph();
+    });
+
+
+    density_material = materialProperties["Железо"].first;
+    Cp_Fe = materialProperties["Железо"].second;
+
+    auto str = materialComboBox->currentText();
+    name_material = str.toStdString();
 
     QLabel *radiusLabel = new QLabel("Радиус (blue) (м):", this);
 
     QLabel *temperatureLabel = new QLabel("Начальная температура частицы (K):", this);
     QLabel *maxTemperatureLabel = new QLabel("Температура потока (K):", this);
 
-    // Создаем поля ввода
+
     radiusInput = new QDoubleSpinBox(this);
     radiusInput->setRange(0.0001, 0.1);
     radiusInput->setValue(0.0001);
@@ -56,8 +89,12 @@ mainwindow::mainwindow(QWidget *parent) :
     temperatureLayout->addWidget(temperatureLabel);
     temperatureLayout->addWidget(temperatureInput);
 
+    QHBoxLayout *materialLayout = new QHBoxLayout();
+    materialLayout->addWidget(new QLabel("Выберите материал:", this)); // Подпись для выбора материала
+    materialLayout->addWidget(materialComboBox);  // Выпадающий список для выбора материала
 
     QVBoxLayout *layout = new QVBoxLayout();
+    layout->addLayout(materialLayout);
     layout->addLayout(radiusLayout);
     layout->addLayout(temperatureLayout);
     layout->addLayout(maxTemperatureLayout);
@@ -74,11 +111,13 @@ mainwindow::mainwindow(QWidget *parent) :
     updateGraph();
 }
 
-mainwindow::~mainwindow() {
+mainwindow::~mainwindow()
+{
     delete ui;
 }
 
-void mainwindow::updateGraph() {
+void mainwindow::updateGraph()
+{
     long double radius = radiusInput->value();
     long double current_temperature = temperatureInput->value();
 
@@ -86,7 +125,8 @@ void mainwindow::updateGraph() {
     calculateTemperatures(radius, current_temperature);
 }
 
-void mainwindow::calculateTemperatures(long double radius, long double current_temperature) {
+void mainwindow::calculateTemperatures(long double radius, long double current_temperature)
+{
     long double temperature_gas = maxTemperatureInput->value();
     long double previous_temperature;
 
@@ -127,22 +167,19 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
         time_values.push_back(counter);
         temperature_values.push_back(current_temperature);
 
-//        long double delta_temp = std::abs(current_temperature - previous_temperature);
-//        if (delta_temp > 0.05) {
-//            step /= 2;
-//            current_temperature = previous_temperature;
-//        }
 
         long double delta_temp = std::abs(current_temperature - previous_temperature);
 
-        if (delta_temp > 0.5) {
+        if (delta_temp > 0.5)
+        {
             step *= std::max((long double)0.5, 1.0 - delta_temp / 10.0);
             current_temperature = previous_temperature;
-        } else if (delta_temp < 0.001 && step < 1.0) {
+        }
+        else if (delta_temp < 0.001 && step < 1.0)
+        {
             step *= 1.2;
         }
 
-        //total_time += step;
         counter++;
     }
 
@@ -168,8 +205,10 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
     graphwidget->update_total_time(total_time);
 
     size_t intersectionIndex = -1;
-    for (size_t i = 1; i < temperature_values.size(); ++i) {
-        if (std::abs(temperature_values[i - 1] - temperature_gas) < 0.001) {
+    for (size_t i = 1; i < temperature_values.size(); ++i)
+    {
+        if (std::abs(temperature_values[i - 1] - temperature_gas) < 0.001)
+        {
             intersectionIndex = i;
             break;
         }
@@ -177,7 +216,17 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
 
     if (intersectionIndex != -1)
     {
-        std::cout << std::left << std::setw(15) << "Counter"
+//        std::ofstream file2(filename, std::ios::trunc );
+//        if(!file2.is_open())
+//            throw std::runtime_error("Can't open file! 1");
+//        file2.close();
+        std::ofstream file(filename, std::ios::app  );
+        if(!file.is_open())
+            throw std::runtime_error("Can't open file! 2");
+
+        file << beg_temperature << " -> " << temperature_gas << " for radius = " << std::setw(6) << radius << " for material: " << name_material <<  std::endl;
+
+        file << std::setw(15) << "Counter"
                   << " | " << std::setw(15) << "Time"
                   << " | " << std::setw(15) << "Velocity"
                   << " | " << std::setw(25) << "Distance"
@@ -185,7 +234,7 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
                   << std::endl;
 
 
-        std::cout << std::setfill(' ') << std::setw(15) << ""
+        file << std::left << std::setfill(' ') << std::setw(15) << ""
                   << " | " << std::setw(15) << ""
                   << " | " << std::setw(15) << ""
                   << " | " << std::setw(25) << ""
@@ -196,7 +245,7 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
         for(size_t i = 0; i < counter_values.size(); i += 923)
         {
 
-            std::cout << std::left << std::setw(15) << counter_values[i]
+            file << std::left << std::setw(15) << counter_values[i]
                       << " | " << std::setw(15) << std::fixed << std::setprecision(2)
                       << (time_values[i] * total_time * 1.5) / (time_values[intersectionIndex])
                       << " | " << std::setw(15) << velocity_values[i]
@@ -208,12 +257,16 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
         }
 
 
-        std::cout << std::left << std::setw(15) << counter_values[counter_values.size() - 1]
+        file << std::left << std::setw(15) << counter_values[counter_values.size() - 1]
                   << " | " << std::setw(15) << total_time
                   << " | " << std::setw(15) << velocity_values[velocity_values.size() - 1]
                   << " | " << std::setw(25) << g * total_time * total_time / 2
                   << " | " << std::setw(15) << temperature_values[intersectionIndex]
                   << std::endl;
+
+        file << "\n\n\n" << std::endl;
+
+        file.close();
     }
     else
     {
