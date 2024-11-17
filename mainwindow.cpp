@@ -226,42 +226,34 @@ void mainwindow::calculateTemperatures(long double radius, long double current_t
 
         file <<"#"<< beg_temperature << " -> " << temperature_gas << " for radius = " << std::setw(6) << radius << " for material: " << name_material <<  std::endl;
 
-        file << std::setw(15) << "Counter"
-                  << " | " << std::setw(15) << "Time"
-                  << " | " << std::setw(15) << "Velocity"
-                  << " | " << std::setw(25) << "Distance"
-                  << " | " << std::setw(15) << "Temperature"
-                  << std::endl;
-
-
-        file << std::left << std::setfill(' ') << std::setw(15) << ""
-                  << " | " << std::setw(15) << ""
-                  << " | " << std::setw(15) << ""
-                  << " | " << std::setw(25) << ""
-                  << " | " << std::setw(15) << ""
+        file << "Counter"
+                  << "," <<  "Time"
+                  << "," << "Velocity"
+                  << "," <<  "Distance"
+                  << "," << "Temperature"
                   << std::endl;
 
 
         for(size_t i = 0; i < counter_values.size(); i += 923)
         {
 
-            file << std::left << std::setw(15) << counter_values[i]
-                      << " | " << std::setw(15) << std::fixed << std::setprecision(2)
+            file << counter_values[i]
+                      << "," << std::fixed << std::setprecision(6)
                       << (time_values[i] * total_time * 1.5) / (time_values[intersectionIndex])
-                      << " | " << std::setw(15) << velocity_values[i]
-                      << " | " << std::setw(25)
+                      << "," << velocity_values[i]
+                      << ","
                       << g * (time_values[i] * total_time * 1.5) / (time_values[intersectionIndex])
                          * (time_values[i] * total_time * 1.5) / (time_values[intersectionIndex]) / 2
-                      << " | " << std::setw(15) << temperature_values[i]
+                      << ","<< temperature_values[i]
                       << std::endl;
         }
 
 
-        file << std::left << std::setw(15) << counter_values[counter_values.size() - 1]
-                  << " | " << std::setw(15) << total_time
-                  << " | " << std::setw(15) << velocity_values[velocity_values.size() - 1]
-                  << " | " << std::setw(25) << g * total_time * total_time / 2
-                  << " | " << std::setw(15) << temperature_values[intersectionIndex]
+        file << counter_values[counter_values.size() - 1]
+                  << ","  << total_time
+                  << "," << velocity_values[velocity_values.size() - 1]
+                  << "," << g * total_time * total_time / 2
+                  << ","  << temperature_values[intersectionIndex]
                   << std::endl;
 
         file << "\n\n\n" << std::endl;
